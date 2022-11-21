@@ -3,7 +3,7 @@
 <plist version="1.0">
 <dict>
 	<key>NSAppTransportSecurity</key>
-	<key>NSAllowsArbitraryLoads</key><true/>
+	<key>NSAllowsArbitraryLoads</key>
 	<key>CFBundleDevelopmentRegion</key>
 	<string>$(DEVELOPMENT_LANGUAGE)</string>
 	<key>CFBundleDisplayName</key>

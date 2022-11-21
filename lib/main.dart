@@ -14,11 +14,12 @@ class MyApp extends StatelessWidget {
   Widget build(BuildContext context) {
     return const MaterialApp(
       debugShowCheckedModeBanner: false,
+      // theme: ThemeData(useMaterial3: true),
       // theme: ThemeData(
       //   scaffoldBackgroundColor: Color(0xFFD2FFF4) , 
       //   textTheme: Theme.of(context).textTheme.apply(bodyColor: Color(0xFF2D5D70)),
       // ),
-      home:  LoginPage(),
+      home:  LoginPage()
     );
   }
 }

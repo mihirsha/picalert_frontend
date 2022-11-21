@@ -1,100 +1,55 @@
 
-
-
 // ignore: import_of_legacy_library_into_null_safe
 
-// ignore_for_file: use_build_context_synchronously, unused_local_variable
-
-import 'dart:convert';
+// ignore_for_file: use_build_context_synchronously
 
 import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'homePage.dart';
-import 'registration.dart';
+import 'login.dart';
 
 
-List arr = [];
-extension EmailValidator on String {
-  bool isValidEmail() {
-    return RegExp(
-            r'^(([^<>()[\]\\.,;:\s@\"]+(\.[^<>()[\]\\.,;:\s@\"]+)*)|(\".+\"))@((\[[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\.[0-9]{1,3}\])|(([a-zA-Z\-0-9]+\.)+[a-zA-Z]{2,}))$')
-        .hasMatch(this);
-  }
-}
-
-class LoginPage extends StatefulWidget {
-  const LoginPage({Key?key}) : super(key: key);
+class RegistrationPage extends StatefulWidget {
+  const RegistrationPage({Key?key}) : super(key: key);
 
 
   // This widget is the root of your application.
   @override
-  State<LoginPage> createState() => _LoginPageState();
+  State<RegistrationPage> createState() => _RegistrationPageState();
 }
 
-class _LoginPageState extends State<LoginPage>  {
+class _RegistrationPageState extends State<RegistrationPage>  {
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
+  final _firstnameController = TextEditingController();
+  final _lastnameController = TextEditingController();
 
   // ignore: non_constant_identifier_names
-  Future sign_in() async{
+  Future sign_up() async{
 
-      String token = "";
       String email = _emailController.text.trim();
       String password = _passwordController.text.trim();
-      if (email.isValidEmail() == true){
+      String firstname = _firstnameController.text.trim();
+      String lastname = _lastnameController.text.trim();
 
-        String tokenDict = await login(email, password);
-        if (tokenDict != ""){
-          var map = jsonDecode(tokenDict);
-          token = token + map["token"];
-          if (token != ""){
-            String urlFetchUserInfo = "https://picalertapp-backend.herokuapp.com/api/user/me/";
-            Response response =  await get(
-              Uri.parse(urlFetchUserInfo),
-              headers: {'Authorization': 'Token $token'},
-            );
-            
-            var infoDetails = jsonDecode(response.body);
-            print(infoDetails["email"]);
-            storeToken(token);
-            // ignore: await_only_futures
-            await Storedata(token);
-            print(arr);
-            Navigator.of(context).pop();
-            // ignore: use_build_context_synchronously
-            Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(arr: arr)));
-          }else{
-          showDialog(
-            context: context,
-            builder: (context) {
-              Future.delayed(const Duration(milliseconds: 1500), () {
-                Navigator.of(context).pop(true);
-              });
-              return const CupertinoAlertDialog(
-                title: Text("Incorrect Credentials"),
-              );
-            
+      if (email == "" || password == "" || firstname == "" || lastname == ""){
+        showDialog(
+          context: context,
+          builder: (context) {
+            Future.delayed(const Duration(milliseconds: 1500), () {
+              Navigator.of(context).pop(true);
             });
+            return const CupertinoAlertDialog(
+              title: Text('Please enter all fields'),
+            );
+          });
+      }else{
+        if (email.isValidEmail() == true){
+          Register(email, password, firstname, lastname);
 
-          }
         }else{
           showDialog(
-            context: context,
-            builder: (context) {
-              Future.delayed(const Duration(milliseconds: 1500), () {
-                Navigator.of(context).pop(true);
-                
-              });
-              return const CupertinoAlertDialog(
-                title: Text("Incorrect Credentials"),
-              );
-            });
-          } 
-      }else{
-        showDialog(
           context: context,
           builder: (context) {
             Future.delayed(const Duration(milliseconds: 1500), () {
@@ -104,7 +59,10 @@ class _LoginPageState extends State<LoginPage>  {
               title: Text("Invalid Email"),
             );
           });
-      }
+        }
+
+      } 
+      
   }
   @override
   Widget build(BuildContext context) {
@@ -119,23 +77,23 @@ class _LoginPageState extends State<LoginPage>  {
                 // mainAxisAlignment: MainAxisAlignment.center,
                 // Image.asset('images/favicon.png'),  
                 Text(
-                  'PicAlert',
+                  'Sign Up',
                   style : GoogleFonts.bebasNeue(
                     fontSize: 52,
                   ),
                 ),
                 const SizedBox(height: 10),
                 const Text(
-                  'Welcome back !!',
+                  'Join us for Free',
                   style : TextStyle(
                     fontSize:24,
                   ),
                 ),
-                const SizedBox(height: 50),
+                const SizedBox(height: 30),
                 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
-                  child: TextFormField(
+                  child: TextField(
                     controller: _emailController,
                     decoration: InputDecoration(
                       enabledBorder: OutlineInputBorder(
@@ -153,7 +111,7 @@ class _LoginPageState extends State<LoginPage>  {
                   ),
                 ),
           
-                const SizedBox(height: 10),
+                const SizedBox(height: 15),
           
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
@@ -175,23 +133,65 @@ class _LoginPageState extends State<LoginPage>  {
                     ),
                   ),
                 ),
+                const SizedBox(height: 15),
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextField(
+                    controller:_firstnameController,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      hintText: 'First Name',
+                      fillColor: Colors.grey[200],
+                      filled: true
+                    ),
+                  ),
+                ),
+                const SizedBox(height: 15),
+
+
+                Padding(
+                  padding: const EdgeInsets.symmetric(horizontal: 25.0),
+                  child: TextField(
+                    controller:_lastnameController,
+                    decoration: InputDecoration(
+                      enabledBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.white),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      focusedBorder: OutlineInputBorder(
+                        borderSide: const BorderSide(color: Colors.deepPurple),
+                        borderRadius: BorderRadius.circular(12),
+                      ),
+                      hintText: 'Last Name',
+                      fillColor: Colors.grey[200],
+                      filled: true
+                    ),
+                  ),
+                ),
                 const SizedBox(height: 20),
 
                 Padding(
                   padding: const EdgeInsets.symmetric(horizontal: 25.0),
                   child: GestureDetector(
-                    onTap: sign_in,
+                    onTap: sign_up,
                     child: Container(
                       padding: const EdgeInsets.all(20),
                       decoration: BoxDecoration(
                         color: Colors.deepPurple,
                         borderRadius:BorderRadius.circular(12),
-                        // border: Border.all(color: Colors.black)
                       ),
                       child: const Center(
                         child: Center(
                           child: Text(
-                            'Sign in',
+                            'Sign up',
                             style: TextStyle(
                               color : Colors.white ,
                               fontWeight: FontWeight.bold,
@@ -201,26 +201,26 @@ class _LoginPageState extends State<LoginPage>  {
                       ),
                       
                     ),
-                  ),
+                              ),
                   ),
               ),
               const SizedBox(height: 25),
-          
+
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
                   const Text(
-                    'Not a Member?', 
+                    'Already a Member?', 
                     style:TextStyle(
                       fontWeight: FontWeight.bold,
                     ),
                   ),
                   GestureDetector(
                     onTap: (){
-                      Navigator.push(context, MaterialPageRoute(builder: (context) => const RegistrationPage()));
+                      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
                     },
                     child: const Text(
-                    ' Register Now', 
+                    ' Login Now', 
                     style: TextStyle(
                       color : Colors.blue ,
                       fontWeight: FontWeight.bold,
@@ -229,7 +229,7 @@ class _LoginPageState extends State<LoginPage>  {
                   ),
                   ],
                 ),
-            
+
               ],
             ),
           ),
@@ -237,10 +237,9 @@ class _LoginPageState extends State<LoginPage>  {
       )
     );
   }
-
-  login(String email, String password) async {
-
-
+  
+  // ignore: non_constant_identifier_names
+  Register(String email, String password, String firstname, String lastname) async {
     showDialog(
       context: context,
       builder: (context){
@@ -248,86 +247,71 @@ class _LoginPageState extends State<LoginPage>  {
         );
       }
     );
-
-    String urlFetchUserToken = "https://picalertapp-backend.herokuapp.com/api/user/token/";
+    String baseurl = "https://picalertapp-backend.herokuapp.com/api/user/create/";
 
     try{
       Response response =  await post(
-        Uri.parse(urlFetchUserToken),
+        Uri.parse(baseurl),
         body: {
           'email' : email,
           'password' : password,
+          'firstname': firstname,
+          'lastname' : lastname,
         }
       );
 
-      if (response.statusCode == 200){
-        print(response.body[0]);
-        return response.body;
+      if (response.statusCode == 201){
+        showDialog(
+          context: context,
+          builder: (context) {
+            Future.delayed(const Duration(seconds: 4), () {
+              Navigator.of(context).pop(true);
+              Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+            });
+            return const CupertinoAlertDialog(
+              title: Text("New User Created"),
+            );
+          });
+        
+        // print("Create User");
 
-      }
-      else{
+        // ignore: use_build_context_synchronously
+        // Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+
+      }else if(response.statusCode == 400){
         showDialog(
           context: context,
           builder: (context) {
             Future.delayed(const Duration(milliseconds: 1500), () {
               Navigator.of(context).pop(true);
+              Navigator.of(context).pop(true);
+              // Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
             });
             return const CupertinoAlertDialog(
-              title: Text("Incorrect Credentials"),
+              title: Text('User Already Exists !!'),
             );
           });
-        print("Issue");
-        Navigator.of(context).pop(true);
-        Navigator.of(context).pop(true);
-        return "";
+        
+        // print(response.body);
+        // print("User already Registered !!");
+      }
+      else{
+        showDialog(
+          context: context, 
+          builder: (context) => const CupertinoAlertDialog(
+            title: Text("some issue occured please register after sometime"),
+            content: Text(""),
+          )
+        );
+        
+        print("Error");
       }
 
     }catch(e){
-
-      Navigator.of(context).pop();
       print(e.toString());
+    
+    return false;
 
     }
-    
   }
-
-  void storeToken(String token) async {
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('token', token);
-  }
-
-  void storedata(String data) async {
-    
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('data', data);
-  }
-
-
-
-
-  // ignore: non_constant_identifier_names
-  Future Storedata(token) async{
-    
-    // ignore: unrelated_type_equality_checks
-    if (token == Null){
-      // ignore: use_build_context_synchronously
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-
-    }else{
-    String infoUrl = "https://picalertapp-backend.herokuapp.com/api/area/create-area/";
-    Response response =  await get(
-      Uri.parse(infoUrl),
-      headers: {'Authorization': 'Token $token'},
-
-    );
-    print(response.body);
-    storedata(response.body);
-    var list = jsonDecode(response.body);
-    for(int i = 0; i<list.length;i++){
-      arr.add(list[i]['title']);
-    }
-
-  }
-  }
-
 }
