@@ -45,7 +45,7 @@ class indivArea extends StatelessWidget {
                     //action coe when button is pressed
                 }, 
                 alignment: Alignment.centerRight,
-                icon: Icon(Icons.edit),
+                icon: const Icon(Icons.edit),
               )
             ],
 

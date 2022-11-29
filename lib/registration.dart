@@ -274,8 +274,6 @@ class _RegistrationPageState extends State<RegistrationPage>  {
           });
         
         // print("Create User");
-
-        // ignore: use_build_context_synchronously
         // Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
 
       }else if(response.statusCode == 400){

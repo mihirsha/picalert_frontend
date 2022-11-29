@@ -1,32 +1,70 @@
-// ignore_for_file: file_names, no_logic_in_create_state, use_build_context_synchronously
-
+// ignore_for_file: file_names, no_logic_in_create_state, use_build_context_synchronously, unrelated_type_equality_checks, unused_local_variable, prefer_typing_uninitialized_variables, dead_code, sort_child_properties_last, avoid_unnecessary_containers
+// deepshah995@gmail.com
 import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
 import 'package:google_nav_bar/google_nav_bar.dart';
-// import 'package:http/http.dart';
-import 'area_Indiv_design.dart';
+import 'package:http/http.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'login.dart';
 
 
 class HomePage extends StatefulWidget {
-  
-
-  List arr;
-
-  HomePage({super.key, required this.arr});
+  const HomePage({super.key});
   @override
   State<HomePage> createState() => _HomePageState();
 }
 
 class _HomePageState extends State<HomePage> {
+  final String url = "https://picalertapp-backend.herokuapp.com/api/area/create-area/";
+  List data = [];
 
-  
-  // getdata();
+  @override
+  void initState(){
+    super.initState();
+    this.retrievedata();
+  }
+
+  Future<String> retrievedata() async{
+
+    SharedPreferences prefs = await SharedPreferences.getInstance();
+    String? token = prefs.getString('token');
+    // print(token);
+
+    if (token != Null){
+      String infoUrl = "https://picalertapp-backend.herokuapp.com/api/area/create-area/";
+      Response response =  await get(
+        Uri.parse(infoUrl),
+        headers: {'Authorization': 'Token $token'},
+      );
+      print(response.body);
+      storedata(response.body);
+      setState(() {
+        var info = jsonDecode(response.body);
+        for(int i=0; i<info.length; i++){
+          data.add(info[i]["title"]);
+        }
+      });
+      
+      // print(data);
+      return "Success";
+    }
+    else{  
+      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
+      return "";
+    }
+    // Navigator.of(context).pop(true);
+    
+  }
+
+
+
   @override
   Widget build(BuildContext context) {
+
+
+    // final String arr = await retrievetoken();
     return Scaffold(
       
       bottomNavigationBar: const GNav(
@@ -44,8 +82,8 @@ class _HomePageState extends State<HomePage> {
       ),
 
       body: CustomScrollView(
+        semanticChildCount: data.length,
         slivers: [
-
           SliverAppBar.large(
             backgroundColor: Colors.white,
             leading: IconButton(
@@ -55,14 +93,13 @@ class _HomePageState extends State<HomePage> {
 
             ),
             title: const Text(
-              
               'Areas',
               style: TextStyle(fontSize: 25),
 
               ),
             actions: [
               IconButton(
-                onPressed: fetchdata, 
+                onPressed: (){}, 
                 icon: const Icon(Icons.more_vert),
                 color: Colors.black,
               )
@@ -70,64 +107,37 @@ class _HomePageState extends State<HomePage> {
           ),
 
 
-          SliverToBoxAdapter(
-            child: Column(
-              children: [
-                for(int i = 0; i < arr.length; i++)
-                  indivArea(text: arr[i]),
+          SliverList(
+              delegate: SliverChildBuilderDelegate(
+                childCount: data.length,
+                (BuildContext context, int index){  
+              return Container(
+                child: Center(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.stretch,
+                    children: <Widget> [
+                      Card(
+                        child: Container(
+                          child: Text(data[index]),
+                          padding: const EdgeInsets.all(20.0),
 
-                GestureDetector(
-                  onTap: (){},
-                  child: Container(
-                    margin: const EdgeInsets.only(left: 330, right:20),
-                    padding: const EdgeInsets.all(15),
-                    decoration: BoxDecoration(
-                      color: Colors.deepPurple,
-                      borderRadius:BorderRadius.circular(100),
-                      // border: Border.all(color: Colors.black)
-                    ),
-                    child: const Center(
-                      child: Center(
-                        child: Text(
-                          '+',
-                          style: TextStyle(
-                            color : Colors.white ,
-                            fontWeight: FontWeight.bold,
-                            fontSize: 18,
-                          ),
+                        ),
                       ),
-                    ),
-                      
-                    ),
+                    ],
                   ),
+                  
                 ),
-              ],
-              
-            )
-          )
+              );
+            },
+          ),
+          ),
         ],
       ),
     );
   }
 
-  Future fetchdata() async {
+  void storedata(String data) async {
     SharedPreferences prefs = await SharedPreferences.getInstance();
-    String? encodedList = prefs.getString('data');
-    
-    if (String == Null){
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-    }else{
-      var list = jsonDecode(encodedList!);
-      // ignore: void_checks
-      List titleData = [];
-      // for (int i = 0; i<list.length;i++){
-      //   arr.add(list[i]["title"]);
-      // }
-      // print(arr);
-      return list;
-
-    }
+    await prefs.setString('data', data);
   }
-
 }
-

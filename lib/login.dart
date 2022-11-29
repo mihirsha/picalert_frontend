@@ -16,7 +16,7 @@ import 'homePage.dart';
 import 'registration.dart';
 
 
-List arr = [];
+// List arr = [];
 extension EmailValidator on String {
   bool isValidEmail() {
     return RegExp(
@@ -56,16 +56,14 @@ class _LoginPageState extends State<LoginPage>  {
               Uri.parse(urlFetchUserInfo),
               headers: {'Authorization': 'Token $token'},
             );
-            
             var infoDetails = jsonDecode(response.body);
             print(infoDetails["email"]);
             storeToken(token);
             // ignore: await_only_futures
-            await Storedata(token);
-            print(arr);
+            // await Storedata(token);
+            // print(arr);
             Navigator.of(context).pop();
-            // ignore: use_build_context_synchronously
-            Navigator.push(context, MaterialPageRoute(builder: (context) => HomePage(arr: arr)));
+            Navigator.push(context, MaterialPageRoute(builder: (context) => const HomePage()));
           }else{
           showDialog(
             context: context,
@@ -205,6 +203,32 @@ class _LoginPageState extends State<LoginPage>  {
                   ),
               ),
               const SizedBox(height: 25),
+
+
+            ElevatedButton(
+            child: Text('Sign in'),
+            onPressed: sign_in,
+            style: ButtonStyle(
+                shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+                  RoundedRectangleBorder(
+                  borderRadius: BorderRadius.circular(18.0),
+                  side: const BorderSide(color: Colors.black)
+                )
+                ),
+
+                padding: MaterialStateProperty.all(
+                  const EdgeInsets.all(25)
+                ),
+                textStyle: MaterialStateProperty.all(
+                  const TextStyle(
+                    fontWeight: FontWeight.bold,
+                    fontSize: 18,
+                    ),
+                  ),
+                ),
+            ),
+
+
           
               Row(
                 mainAxisAlignment: MainAxisAlignment.center,
@@ -240,7 +264,6 @@ class _LoginPageState extends State<LoginPage>  {
 
   login(String email, String password) async {
 
-
     showDialog(
       context: context,
       builder: (context){
@@ -261,7 +284,7 @@ class _LoginPageState extends State<LoginPage>  {
       );
 
       if (response.statusCode == 200){
-        print(response.body[0]);
+        // print(response.body);
         return response.body;
 
       }
@@ -295,39 +318,4 @@ class _LoginPageState extends State<LoginPage>  {
     SharedPreferences prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
   }
-
-  void storedata(String data) async {
-    
-    SharedPreferences prefs = await SharedPreferences.getInstance();
-    await prefs.setString('data', data);
-  }
-
-
-
-
-  // ignore: non_constant_identifier_names
-  Future Storedata(token) async{
-    
-    // ignore: unrelated_type_equality_checks
-    if (token == Null){
-      // ignore: use_build_context_synchronously
-      Navigator.push(context, MaterialPageRoute(builder: (context) => const LoginPage()));
-
-    }else{
-    String infoUrl = "https://picalertapp-backend.herokuapp.com/api/area/create-area/";
-    Response response =  await get(
-      Uri.parse(infoUrl),
-      headers: {'Authorization': 'Token $token'},
-
-    );
-    print(response.body);
-    storedata(response.body);
-    var list = jsonDecode(response.body);
-    for(int i = 0; i<list.length;i++){
-      arr.add(list[i]['title']);
-    }
-
-  }
-  }
-
 }
