@@ -7,7 +7,9 @@ import 'package:flutter/cupertino.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:http/http.dart';
+import 'package:picalertapp/utils/utils.dart';
 import 'login.dart';
+
 
 
 class RegistrationPage extends StatefulWidget {
@@ -45,7 +47,7 @@ class _RegistrationPageState extends State<RegistrationPage>  {
             );
           });
       }else{
-        if (email.isValidEmail() == true){
+        if (isValidEmail(email, context) == true){
           Register(email, password, firstname, lastname);
 
         }else{

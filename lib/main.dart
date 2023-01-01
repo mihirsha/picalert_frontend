@@ -1,8 +1,23 @@
+// ignore_for_file: unused_import, unused_local_variable
 
 import 'package:flutter/material.dart';
-import 'login.dart';
+import 'package:flutter/services.dart';
+import 'package:picalertapp/HomePage.dart';
+import 'package:picalertapp/login.dart';
+import 'package:picalertapp/splashScreen.dart';
+import 'package:picalertapp/utils/sharedPreferences.dart';
 
-void main() {
+Future main() async{
+
+  String token = "";
+  WidgetsFlutterBinding.ensureInitialized();
+  await SystemChrome.setPreferredOrientations([
+    DeviceOrientation.portraitDown,
+    DeviceOrientation.portraitUp,
+  ]);
+  
+  await UserSharedPreferences.init();
+  
   runApp(const MyApp());
 }
 
@@ -12,14 +27,9 @@ class MyApp extends StatelessWidget {
   // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
-      debugShowCheckedModeBanner: false,
-      // theme: ThemeData(useMaterial3: true),
-      // theme: ThemeData(
-      //   scaffoldBackgroundColor: Color(0xFFD2FFF4) , 
-      //   textTheme: Theme.of(context).textTheme.apply(bodyColor: Color(0xFF2D5D70)),
-      // ),
-      home:  LoginPage()
-    );
-  }
+      return const MaterialApp(
+        debugShowCheckedModeBanner: false,
+        home: splashScreen(),
+      );
+    }
 }
